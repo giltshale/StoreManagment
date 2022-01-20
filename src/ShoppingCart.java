@@ -1,6 +1,6 @@
 public class ShoppingCart {
     private Products[] products;
-    private int totalToPay;
+    private double totalToPay;
 
     public ShoppingCart() {
         this.products = new Products[0];
@@ -20,7 +20,7 @@ public class ShoppingCart {
         this.products = products;
     }
 
-    public void setTotalToPay(int totalToPay) {
+    public void setTotalToPay(double totalToPay) {
         this.totalToPay = totalToPay;
     }
 
@@ -28,7 +28,7 @@ public class ShoppingCart {
         return products;
     }
 
-    public int getTotalToPay() {
+    public double getTotalToPay() {
         return totalToPay;
     }
 

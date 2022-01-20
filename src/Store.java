@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.Scanner;
@@ -13,11 +14,24 @@ public class Store {
     private static final int NONE_RELEVANT_VALUE = -1;
     private static final int PASS_LENGTH = 6;
     private static final int VIP = 1;
+    private static final int PRINT_ALL_CUSTOMERS = 1;
+    private static final int PRINT_ALL_VIP_CUSTOMERS = 2;
+    private static final int CUSTOMERS_WITH_AT_LEAST_ONE_BUY = 3;
+    private static final int MOST_BUYING_CUSTOMER = 4;
+    private static final int ADD_PRODUCT = 5;
+    private static final int CHANGE_PRODUCT_STATUS = 6;
+    private static final int BUY_AS_CLIENT = 7;
+    private static final int MAIN_MENU = 8;
+    private static final int ONE_HUNDRED = 100;
+    private static final double REGULAR_WORKER_DISCOUNT = 0.9;
+    private static final double MANAGER_DISCOUNT = 0.8;
+    private static final double BOARD_MANAGER_DISCOUNT = 0.7;
+
+
     private Customer[] employees;
     private Customer[] customers;
     private Products[] products;
     private Customer currentUser;
-
 
     public void setCurrentUser(Customer currentUser) {
         this.currentUser = currentUser;
@@ -27,22 +41,23 @@ public class Store {
         this.employees = new Customer[0];
         this.customers = new Customer[0];
         this.products = new Products[15];
-        products[0] = new Products("bisli", 20, 3, true, 2);
+        products[0] = new Products("bisli", 20, 6, true, 10);
         String[] suply = new String[]{"bamba ", "meat ", "fish ", "orange juice "
                 , "banana", "cucumbers ", "tamato ", "eggplant's", "shampoo",
                 "gumigum", "lettuce", "steak", "onions", "melon"};
         Random random = new Random();
-        int price = random.nextInt(100);
+        int price;
         Random random1 = new Random();
-        int howManyPieces = random1.nextInt(20);
+        int howManyPieces;
         int[] discount = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
         for (int i = 1; i < 15; i++) {
+            price = random.nextInt(100);
+            howManyPieces = random1.nextInt(20);
             this.products[i] = new Products(suply[i - 1], price, howManyPieces, true, discount[i]);
         }
 
     }
-
 
     public void setProducts(Products[] products) {
         this.products = products;
@@ -68,17 +83,46 @@ public class Store {
         return this.customers;
     }
 
+    private void printExistingProducts() {
+
+        for (int i = 0; i < this.products.length; i++) {
+            if (products[i].getHowManyLeft() < 1) {
+                products[i].setAvailable(false);
+            }
+            if (products[i].isAvailable()) {
+                System.out.println((i) + "." + products[i].getProductName());
+                System.out.println("price: " + products[i].getPrice());
+                System.out.println("vip discount " + products[i].getMemberDiscount());
+                System.out.println("number of items " + products[i].getHowManyLeft());
+            }
+        }
+    }
+
+    private double discounts(int selectedProduct) {
+        double discount = 1;
+        if (currentUser instanceof Employee) {
+            if (((Employee) currentUser).getRank() == Employee.REGULAR_WORKER) {
+                discount = REGULAR_WORKER_DISCOUNT;
+            } else if (((Employee) currentUser).getRank() == Employee.MANAGER) {
+                discount = MANAGER_DISCOUNT;
+            } else {
+                discount = BOARD_MANAGER_DISCOUNT;
+            }
+        } else {
+            if (currentUser.isMember()) {
+                discount = 1 - (this.products[selectedProduct].getMemberDiscount() / ONE_HUNDRED);
+            }
+        }
+        return discount;
+    }
+
     public void existingProducts() {
         Scanner scanner = new Scanner(System.in);
 
         int selectedProduct;
 
         do {
-            for (int i = 0; i < this.products.length; i++) {
-                if (products[i].getHowManyLeft() > 0) {
-                    System.out.println((i) + "." + products[i].getProductName());
-                }
-            }
+            printExistingProducts();
             int wantedNumberOfItems;
             do {
                 System.out.println("please choose product to buy ");
@@ -89,19 +133,56 @@ public class Store {
                     System.out.println("how many items do you want ? ");
                     wantedNumberOfItems = scanner.nextInt();
                 } while (this.products[selectedProduct].getHowManyLeft() < wantedNumberOfItems);
-
-                int howMuchToPay = this.currentUser.getShoppingCart().getTotalToPay();
-                int addToPay = this.products[selectedProduct].getPrice() * wantedNumberOfItems;
-                this.currentUser.getShoppingCart().setTotalToPay(howMuchToPay + addToPay);
+                double discount = discounts(selectedProduct);
+                double addToPay = (this.products[selectedProduct].getPrice() * wantedNumberOfItems) * discount;
+                this.currentUser.getShoppingCart().setTotalToPay(addToPay);
                 addToCart(selectedProduct, wantedNumberOfItems);
-                if (this.currentUser instanceof Customer) {
-                    Customer c = new Customer((Customer) currentUser);
-                    c.addBuy();
-                    c.setAllBuysSum(c.getAllBuysSum() + c.getShoppingCart().getTotalToPay());
-                }
+                this.currentUser.setLastVisit(new Date());
+
+                currentUser.setCurrentSum(this.currentUser.getShoppingCart().getTotalToPay());
+                this.currentUser.addBuy(this.currentUser.getShoppingCart().getTotalToPay());
+                this.currentUser.setAllBuysSum(this.currentUser.getAllBuysSum() + this.currentUser.getShoppingCart().getTotalToPay());
+
             }
         } while (selectedProduct != NONE_RELEVANT_VALUE);
+
+
         System.out.println("your total amount is :  " + this.currentUser.getShoppingCart().getTotalToPay());
+    }
+
+    public void addProduct() {
+        Scanner scanner = new Scanner(System.in);
+        String productName;
+
+        System.out.println("products name : ");
+        productName = scanner.nextLine();
+        int price;
+        int amount = 0;
+        do {
+            System.out.println("what is the price of product? : ");
+            price = scanner.nextInt();
+        } while (price <= ZERO);
+        do {
+            System.out.println("how many items pieces you add? : ");
+            amount = scanner.nextInt();
+        } while (amount <= ZERO);
+        double memberDiscount;
+        do {
+            System.out.println("vip club member discount percentage (number 1-100)? :  ");
+            memberDiscount = scanner.nextDouble();
+        } while (memberDiscount < ZERO || memberDiscount > ONE_HUNDRED);
+
+        memberDiscount = price - price * ((ONE_HUNDRED - memberDiscount) / ONE_HUNDRED);
+        Products product = new Products(productName, price, amount, true, memberDiscount);
+
+        currentUser.shoppingCart.setTotalToPay(currentUser.getCurrentSum());
+        Products[] newProductArray = new Products[products.length + 1];
+        for (int i = 0; i < this.products.length; i++) {
+            newProductArray[i] = this.products[i];
+        }
+        newProductArray[this.products.length] = product;
+        this.products = newProductArray;
+
     }
 
     private void addToCart(int selectedProduct, int amountOfProduct) {
@@ -136,14 +217,16 @@ public class Store {
 
             Customer[] newEmployees = new Customer[this.employees.length + 1];
             for (int i = 0; i < this.employees.length; i++) {
-                newEmployees[i] = new Employee((Employee) this.employees[i]);
+                newEmployees[i] = this.employees[i];
             }
             int rank = 0;
             while (rank != Employee.REGULAR_WORKER && rank != Employee.MANAGER && rank != Employee.BOARD_MEMBER) {
                 System.out.println("Are you regular worker , manager, or board member ? " + "\n" +
                         "(regular worker = 1 , manager = 2 ,board member=3 )");
                 rank = scanner.nextInt();
+
             }
+
             Employee e = new Employee(userName(false), password(), firstName(), lastName(), rank);
             newEmployees[newEmployees.length - 1] = e;
             this.employees = newEmployees;
@@ -245,7 +328,7 @@ public class Store {
 
 
         do {
-            System.out.println("Enter wanted user name ");///////// have not created any costumer,maybe wrong.
+            System.out.println("Enter wanted user name ");
             newUserName = scanner.next();
 
             if (searchCustomer) {
@@ -315,12 +398,17 @@ public class Store {
         int availableProduct;
         boolean available = false;
         for (int i = 0; i < this.products.length; i++) {
-            System.out.println((i) + ". " + this.products[i]);
+            if (products[i].getHowManyLeft() > 0) {
+                System.out.println((i) + "." + products[i].getProductName());
+                System.out.println("price: " + products[i].getPrice());
+                System.out.println("vip discount " + products[i].getMemberDiscount());
+                System.out.println("number of items " + products[i].getHowManyLeft());
+            }
         }
         int size = this.products.length - 1;
         int index;
         do {
-            System.out.println("choose product : (numbers from 0 to )" + size);
+            System.out.println("choose product : numbers from 0 to " + size);
             index = scanner.nextInt();
         } while (index > size || index < 0);
 
@@ -334,6 +422,7 @@ public class Store {
             available = true;
         }
         this.products[index].setAvailable(available);
+
     }
 
     public void printAllCustomers() {
@@ -347,17 +436,17 @@ public class Store {
         }
     }
 
-    private boolean updateAvailability(Products[] products) {
-        boolean available = false;
-        for (Products product : products) {
-            if (product.isAvailable()) {
-                available = true;
-                System.out.println("the product is available !");
-            }
-        }
-        return available;
-    }
-
+    /*  private boolean updateAvailability(Products[] products) {
+          boolean available = false;
+          for (Products product : products) {
+              if (product.isAvailable()) {
+                  available = true;
+                  System.out.println("the product is available !");
+              }
+          }
+          return available;
+      }
+  */
     public void employeeMenu() {
         Scanner scanner = new Scanner(System.in);
 
@@ -376,101 +465,62 @@ public class Store {
 
             userChoice = scanner.nextInt();
 
-        } while (userChoice < 1 || userChoice > 7 && userChoice != 8);
+            switch (userChoice) {
+                case PRINT_ALL_CUSTOMERS:
+                    printAllCustomers();
+                    continue;
+                case PRINT_ALL_VIP_CUSTOMERS:
+                    printAllVipMember();
+                    continue;
+                case CUSTOMERS_WITH_AT_LEAST_ONE_BUY:
+                    System.out.println(Arrays.toString(this.customers) + "\n");
+                    printCustomersWithAtLeastOnePurchase();
+                    continue;
 
-        switch (userChoice) {
-            case 1:
-                printAllCustomers();
-                break;
-            case 2:
-                printAllVipMember();
-                break;
+                case MOST_BUYING_CUSTOMER:
+                    mostProfitCustomerAtStore();
+                    continue;
 
-            case 3:
-                printCustomersWithAtLeastOnePurchase();
-                break;
+                case ADD_PRODUCT:
+                    addProduct();
+                    continue;
 
-            case 4:
-                customerBuyTheMostAtStore();
-                break;
+                case CHANGE_PRODUCT_STATUS:
+                    changeStatusOfProduct();
+                    continue;
+                case BUY_AS_CLIENT:
+                    buyAsClient();
+                    continue;
+                case MAIN_MENU:
+                    return;
+                default:
 
-            case 5:
-                addProduct();
-                break;
+            }
+        } while (userChoice != MAIN_MENU);
 
-            case 6:
-                changeStatusOfProduct();
-                break;
-            case 7:
-                buyAsClient();
-                break;
-
-            default:
-                break;
-
-        }
     }
 
     private void buyAsClient() {
         existingProducts();
     }
 
-    public void addProduct() {
-        Scanner scanner = new Scanner(System.in);
-        String productName;
+    public void mostProfitCustomerAtStore() {
 
-        System.out.println("products name : ");
-        productName = scanner.nextLine();
-        int price;
-        do {
-            System.out.println("what is the price of product? : ");
-            price = scanner.nextInt();
-        } while (price <= ZERO);
-        double memberDiscount;
-        double lessPrice = price - price * 0.3;
-        do {
-            System.out.println("vip club member discount ? :  ");
-            memberDiscount = scanner.nextDouble();
-        } while (memberDiscount < ZERO || memberDiscount > lessPrice);
-
-        memberDiscount = price - (price * memberDiscount / 100);
-        Products product = new Products(productName, price, 1, true, memberDiscount);
-        double discount;
-        if (currentUser instanceof Employee) {
-            if (((Employee) currentUser).getRank() == 1) {
-                discount = price - price * 0.1;
-                currentUser.setCurrentSum(discount);
-            } else if (((Employee) currentUser).getRank() == 2) {
-                discount = price - price * 0.2;
-                currentUser.setCurrentSum(discount);
-            } else {
-                currentUser.setCurrentSum(lessPrice);
-            }
-        } else {
-            if (currentUser.isMember()) {
-                currentUser.setCurrentSum(memberDiscount);
-            }
-        }
-        Products[] newProductArray = new Products[products.length + 1];
-        for (int i = 0; i < this.products.length; i++) {
-            newProductArray[i] = this.products[i];
-        }
-        newProductArray[this.products.length] = product;
-        this.products = newProductArray;
-
-    }
-
-    public void customerBuyTheMostAtStore() {
         if (this.customers.length > 0) {
-            Customer mostProfitCustomer = this.customers[0];
-
-            for (int i = 1; i < this.customers.length; i++) {
-                if (((Customer) this.customers[i]).getNumberOfBuys() > (((Customer) mostProfitCustomer).getAllBuysSum())) {
-                    mostProfitCustomer = this.customers[i];
+            double mostProfitSum = this.customers[0].getAllBuysSum();
+            // Customer mostProfitEmployee=this.employees[0].getAllBuysSum()
+            int index = NONE_RELEVANT_VALUE;
+            for (int i = 0; i < this.customers.length; i++) {
+                if (this.customers[i].getAllBuysSum() > mostProfitSum) {
+                    mostProfitSum = this.customers[i].getAllBuysSum();
+                    index = i;
                 }
             }
-            System.out.println("the customer that buy the most is: " +
-                    mostProfitCustomer.getFirstName() + " " + mostProfitCustomer.getLastName() + "\n");
+            if (index == NONE_RELEVANT_VALUE) {
+                index = 0;
+                System.out.println("the customer that buy the most is: " +
+                        this.customers[index].toString() + "\n");
+            }
         } else {
             System.out.println("list of customers id empty ");
         }
@@ -478,8 +528,11 @@ public class Store {
 
     public void printAllVipMember() {
         int counter = 1;
+        if (customers.length < 1) {
+            System.out.println("there is no vip customers");
+        }
         for (int i = 0; i < this.customers.length; i++) {
-            if (((Customer) customers[i]).isMember()) {
+            if (customers[i].isMember()) {
                 System.out.println(counter);
                 System.out.println(this.customers[i]);
                 counter++;
@@ -488,14 +541,18 @@ public class Store {
     }
 
     public void printCustomersWithAtLeastOnePurchase() {
+
+        if (customers.length < 1) {
+            System.out.println("no customer have made purchase yet ");
+            return;
+        }
         for (int i = 0; i < this.customers.length; i++) {
-            Customer currentCustomer = (Customer) this.customers[i];
-            if (currentCustomer.getNumberOfBuys() >= 1) {
-                System.out.println(currentCustomer);
+            if (this.customers[i].getNumberOfBuys() > 0) {
+                System.out.println(this.customers[i].toString());
             }
         }
-    }
 
+    }
 
 }
 

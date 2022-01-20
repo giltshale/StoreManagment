@@ -13,12 +13,12 @@ public class Products {
         return memberDiscount;
     }
 
-    public Products(String productName, int price, int howManyLeft, boolean isAvailable,double memberDiscount) {
+    public Products(String productName, int price, int howManyLeft, boolean isAvailable, double memberDiscount) {
         this.productName = productName;
         this.price = price;
         this.howManyLeft = howManyLeft;
         this.isAvailable = isAvailable;
-        this.memberDiscount=memberDiscount;
+        this.memberDiscount = memberDiscount;
     }
 
     public void setProductName(String productName) {
@@ -30,11 +30,15 @@ public class Products {
     }
 
     public void setHowManyLeft(int howManyLeft) {
-        this.howManyLeft = howManyLeft;
+        if (!this.isAvailable) {
+            this.howManyLeft = 0;
+        }else {
+            this.howManyLeft = howManyLeft;
+        }
     }
 
     public void setAvailable(boolean available) {
-        isAvailable = available;
+        this.isAvailable = available;
     }
 
     public String getProductName() {
@@ -50,15 +54,20 @@ public class Products {
     }
 
     public boolean isAvailable() {
-        return howManyLeft > 0;
+        return isAvailable;
     }
 
     public Products(String productName, int price, int howManyLeft) {
         this.price = price;
         this.productName = productName;
         this.howManyLeft = howManyLeft;
-
     }
 
-
+    @Override
+    public String toString() {
+        return
+                productName + " " +
+                        +howManyLeft + " "
+                        + memberDiscount;
+    }
 }
