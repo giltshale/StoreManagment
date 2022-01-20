@@ -533,8 +533,7 @@ public class Store {
         }
         for (int i = 0; i < this.customers.length; i++) {
             if (customers[i].isMember()) {
-                System.out.println(counter);
-                System.out.println(this.customers[i]);
+                System.out.println("" + counter + this.customers[i]);
                 counter++;
             }
         }
@@ -548,7 +547,7 @@ public class Store {
         }
         for (int i = 0; i < this.customers.length; i++) {
             if (this.customers[i].getNumberOfBuys() > 0) {
-                System.out.println(this.customers[i].toString());
+                System.out.println((i + 1) + this.customers[i].toString());
             }
         }
 
