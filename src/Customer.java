@@ -11,7 +11,6 @@ public class Customer {
     protected Date lastVisit;
     private double allBuysSum;
     private double currentSum;
-    protected Date date;
 
 
     public double getCurrentSum() {
@@ -19,7 +18,7 @@ public class Customer {
     }
 
     public void setCurrentSum(double currentSum) {
-        this.currentSum += currentSum;
+        this.currentSum = currentSum;
     }
 
     public String getFirstName() {
@@ -42,20 +41,6 @@ public class Customer {
         return shoppingCart;
     }
 
-    public Customer(String userName, String password, String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userName = userName;
-        this.password = password;
-        this.isMember = false;
-        this.shoppingCart = new ShoppingCart();
-        this.numberOfBuys = 0;
-        this.allBuysSum = 0;
-        this.currentSum = 0;
-        this.lastVisit = new Date();
-        this.currentSum = 0;
-    }
-
     public Customer(String userName, String password, String firstName, String lastName, boolean isVIP) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -66,10 +51,9 @@ public class Customer {
         this.shoppingCart = new ShoppingCart();
         this.numberOfBuys = 0;
         this.allBuysSum = 0;
-        this.date = new Date();
+        //this.date = new Date();
         this.currentSum = 0;
         this.isMember = isVIP;
-        this.date = new Date();
         this.currentSum = 0;
     }
 
@@ -90,8 +74,8 @@ public class Customer {
     }
 
 
-    public void setAllBuysSum(double allBuysSum) {
-        this.allBuysSum = allBuysSum;
+    public void setAllBuysSum(double add) {
+        this.allBuysSum += add;
     }
 
     public double getAllBuysSum() {
@@ -122,17 +106,16 @@ public class Customer {
         return numberOfBuys;
     }
 
-    public void addBuy(double add) {
-
-        this.allBuysSum += add;
-        this.date = new Date();
+    public void addBuy() {
+        //this.allBuysSum += add;
+       // this.date = new Date();
         this.numberOfBuys += 1;
     }
 
     @Override
     public String toString() {
         String printedText;
-        String fullName = this.firstName +" "+ this.lastName;
+        String fullName = this.firstName + " " + this.lastName;
 
         if (isMember) {
             printedText = fullName + " (VIP)!\n";
@@ -141,8 +124,8 @@ public class Customer {
             printedText = fullName + "!\n";
         }
         printedText += " " + "number of buys: " +
-                "" + numberOfBuys + "\n total sum of all buys: "+this.allBuysSum
-                + " \n lats purchase made at: " + date+"\n";
+                "" + this.numberOfBuys + "\n total sum of all buys: " + this.allBuysSum
+                + " \n lats purchase made at: " + this.lastVisit + "\n";
 
         return printedText;
     }

@@ -48,19 +48,12 @@ public class Products {
     public int getPrice() {
         return price;
     }
-
     public int getHowManyLeft() {
         return howManyLeft;
     }
 
     public boolean isAvailable() {
         return isAvailable;
-    }
-
-    public Products(String productName, int price, int howManyLeft) {
-        this.price = price;
-        this.productName = productName;
-        this.howManyLeft = howManyLeft;
     }
 
     @Override

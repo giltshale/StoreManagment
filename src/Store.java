@@ -90,15 +90,15 @@ public class Store {
                 products[i].setAvailable(false);
             }
             if (products[i].isAvailable()) {
-                System.out.println((i) + "." + products[i].getProductName());
+                System.out.println((i) + ". " + products[i].getProductName());
                 System.out.println("price: " + products[i].getPrice());
                 System.out.println("vip discount " + products[i].getMemberDiscount());
-                System.out.println("number of items " + products[i].getHowManyLeft());
+                System.out.println("number of items " + products[i].getHowManyLeft() + "\n");
             }
         }
     }
 
-    private double discounts(int selectedProduct) {
+    private double discountByRank(int selectedProduct) {
         double discount = 1;
         if (currentUser instanceof Employee) {
             if (((Employee) currentUser).getRank() == Employee.REGULAR_WORKER) {
@@ -116,7 +116,7 @@ public class Store {
         return discount;
     }
 
-    public void existingProducts() {
+    public void chooseProductAndBuy() {
         Scanner scanner = new Scanner(System.in);
 
         int selectedProduct;
@@ -127,27 +127,33 @@ public class Store {
             do {
                 System.out.println("please choose product to buy ");
                 selectedProduct = scanner.nextInt();
-            } while (selectedProduct > 0 && selectedProduct != NONE_RELEVANT_VALUE && selectedProduct > this.products.length);
+            } while (selectedProduct > 0 && selectedProduct != NONE_RELEVANT_VALUE && selectedProduct > this.products.length - 1);
             if (selectedProduct != NONE_RELEVANT_VALUE) {
                 do {
                     System.out.println("how many items do you want ? ");
                     wantedNumberOfItems = scanner.nextInt();
+                    if (this.products[selectedProduct].getHowManyLeft() < wantedNumberOfItems || !this.products[selectedProduct].isAvailable()) {
+                        System.out.println("item finished in stock for now,try something else ");
+                    }
                 } while (this.products[selectedProduct].getHowManyLeft() < wantedNumberOfItems);
-                double discount = discounts(selectedProduct);
-                double addToPay = (this.products[selectedProduct].getPrice() * wantedNumberOfItems) * discount;
-                this.currentUser.getShoppingCart().setTotalToPay(addToPay);
-                addToCart(selectedProduct, wantedNumberOfItems);
-                this.currentUser.setLastVisit(new Date());
+                double discount = discountByRank(selectedProduct);
 
-                currentUser.setCurrentSum(this.currentUser.getShoppingCart().getTotalToPay());
-                this.currentUser.addBuy(this.currentUser.getShoppingCart().getTotalToPay());
-                this.currentUser.setAllBuysSum(this.currentUser.getAllBuysSum() + this.currentUser.getShoppingCart().getTotalToPay());
+
+                double addToPay = (this.products[selectedProduct].getPrice() * wantedNumberOfItems) * discount;
+                this.currentUser.getShoppingCart().setTotalToPay(this.currentUser.shoppingCart.getTotalToPay() + addToPay);
+                addToCart(selectedProduct, wantedNumberOfItems);
+
+                this.currentUser.setLastVisit(new Date());
+                this.currentUser.addBuy();
 
             }
         } while (selectedProduct != NONE_RELEVANT_VALUE);
 
-
+        this.currentUser.setAllBuysSum(this.currentUser.getShoppingCart().getTotalToPay());
         System.out.println("your total amount is :  " + this.currentUser.getShoppingCart().getTotalToPay());
+        this.currentUser.getShoppingCart().setTotalToPay(0);
+
+
     }
 
     public void addProduct() {
@@ -264,7 +270,7 @@ public class Store {
         int userType;
         String password;
         do {
-            System.out.println(" are you customer or employee ? (1-employee, 0= customer ");
+            System.out.println(" are you customer or employee ? (1-employee, 0= customer )");
             userType = scanner.nextInt();
             scanner.nextLine();
 
@@ -414,7 +420,7 @@ public class Store {
 
 
         do {
-            System.out.println(" the product is available ? ( available = 1, not available = 0");
+            System.out.println(" the product is available ? ( available = 1, not available = 0 )");
             availableProduct = scanner.nextInt();
         } while (availableProduct != PRODUCT_AVAILABLE && availableProduct != PRODUCT_NOT_AVAILABLE);
 
@@ -501,7 +507,7 @@ public class Store {
     }
 
     private void buyAsClient() {
-        existingProducts();
+        chooseProductAndBuy();
     }
 
     public void mostProfitCustomerAtStore() {
@@ -514,16 +520,18 @@ public class Store {
                 if (this.customers[i].getAllBuysSum() > mostProfitSum) {
                     mostProfitSum = this.customers[i].getAllBuysSum();
                     index = i;
+                } else if (this.customers[i].getAllBuysSum() == mostProfitSum) {
+                    index = i;
                 }
             }
-            if (index == NONE_RELEVANT_VALUE) {
-                index = 0;
-                System.out.println("the customer that buy the most is: " +
-                        this.customers[index].toString() + "\n");
-            }
+
+
+            System.out.println("the customer that buy the most is: " +
+                    this.customers[index].toString() + "\n");
         } else {
-            System.out.println("list of customers id empty ");
+            System.out.println("list of customers is empty ");
         }
+
     }
 
     public void printAllVipMember() {
@@ -533,22 +541,26 @@ public class Store {
         }
         for (int i = 0; i < this.customers.length; i++) {
             if (customers[i].isMember()) {
-                System.out.println("" + counter + this.customers[i]);
+                System.out.println("" + counter + ". " + this.customers[i]);
                 counter++;
             }
         }
     }
 
     public void printCustomersWithAtLeastOnePurchase() {
-
+        boolean found = false;
         if (customers.length < 1) {
             System.out.println("no customer have made purchase yet ");
             return;
         }
         for (int i = 0; i < this.customers.length; i++) {
             if (this.customers[i].getNumberOfBuys() > 0) {
-                System.out.println((i + 1) + this.customers[i].toString());
+                found = true;
+                System.out.println((i + 1) +". "+ this.customers[i]);
             }
+        }
+        if (!found) {
+            System.out.println(" there is no customers that have made any purchases ");
         }
 
     }

@@ -7,15 +7,6 @@ public class ShoppingCart {
         this.totalToPay = 0;
     }
 
-    public ShoppingCart(ShoppingCart other) {
-
-        this.products = new Products[other.products.length];
-        for (int i = 0; i < other.products.length; i++) {
-            products[i] = other.products[i];
-        }
-        this.totalToPay = other.totalToPay;
-    }
-
     public void setProducts(Products[] products) {
         this.products = products;
     }
