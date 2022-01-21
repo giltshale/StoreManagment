@@ -12,7 +12,6 @@ public class Customer {
     private double allBuysSum;
     private double currentSum;
 
-
     public double getCurrentSum() {
         return this.currentSum;
     }
