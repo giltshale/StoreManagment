@@ -3,12 +3,12 @@ import java.util.Date;
 public class Customer {
     protected String firstName;
     protected String lastName;
-    protected String userName;
-    protected String password;
-    protected int numberOfBuys;
     protected ShoppingCart shoppingCart;
-    protected boolean isMember;
-    protected Date lastVisit;
+    private String userName;
+    private String password;
+    private int numberOfBuys;
+    private boolean isMember;
+    private Date lastVisit;
     private double allBuysSum;
     private double currentSum;
 
@@ -50,7 +50,6 @@ public class Customer {
         this.shoppingCart = new ShoppingCart();
         this.numberOfBuys = 0;
         this.allBuysSum = 0;
-        //this.date = new Date();
         this.currentSum = 0;
         this.isMember = isVIP;
         this.currentSum = 0;
@@ -107,7 +106,7 @@ public class Customer {
 
     public void addBuy() {
         //this.allBuysSum += add;
-       // this.date = new Date();
+        // this.date = new Date();
         this.numberOfBuys += 1;
     }
 

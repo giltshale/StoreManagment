@@ -10,8 +10,8 @@ public class Employee extends Customer {
     public static final int BOARD_MEMBER = 3;
 
 
-    public Employee( String userName, String password, String firstName, String lastName,int rank) {
-        super(userName,password,firstName,lastName,false,0,0,null,new ShoppingCart());
+    public Employee(String userName, String password, String firstName, String lastName, int rank) {
+        super(userName, password, firstName, lastName, false, 0, 0, null, new ShoppingCart());
         this.rank = rank;
     }
 
@@ -26,6 +26,7 @@ public class Employee extends Customer {
     public int getRank() {
         return rank;
     }
+
     public void setWorkingHours(int workingHours) {
         this.workingHours = workingHours;
     }
@@ -45,15 +46,19 @@ public class Employee extends Customer {
         String manager = "manager";
         String boardMember = "board member";
         String printedText = "";
-        String fullName = this.firstName+" "+this.lastName;
+        String fullName = this.firstName + " " + this.lastName;
 
         if (this.rank == REGULAR_WORKER) {
-            printedText = fullName + " (" + regular + ")" + "!";
+            printedText = fullName + " (" + regular + ")" + "!\n";
         } else if (this.rank == MANAGER) {
-            printedText = fullName + " (" + manager + ")" + "!";
-        } else if(this.rank==BOARD_MEMBER){
-            printedText = fullName + " (" + boardMember + ")" + "!";
+            printedText = fullName + " (" + manager + ")" + "!\n";
+        } else if (this.rank == BOARD_MEMBER) {
+            printedText = fullName + " (" + boardMember + ")" + "!\n";
         }
+        printedText += " " + "number of buys: " +
+                "" + super.getNumberOfBuys() + "\n total sum of all buys: " + super.getAllBuysSum()
+                + " \n lats purchase made at: " + super.getLastVisit() + "\n";
+
         return printedText;
     }
 }
