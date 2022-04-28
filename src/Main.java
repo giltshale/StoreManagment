@@ -1,19 +1,17 @@
 import java.util.Scanner;
 
-
 public class Main {
-    private static final int CREATE_USER = 1;
-    private static final int LOG_IN = 2;
-    private static final int END_PROGRAM = 3;
+    //  private static final int CREATE_USER = 1;
+    //  private static final int LOG_IN = 2;
+    //  private static final int END_PROGRAM = 3;
 
     public static void main(String[] args) {
 
 
         Scanner scanner = new Scanner(System.in);
-        int firstMenuChoose = 0;
         Store store = new Store();
 
-
+        FirstMenu firstMenuChoose;
         while (true) {
             try {// need to improve try {}catch(){};
                 System.out.println("what would you like to do? " + "\n"
@@ -21,7 +19,7 @@ public class Main {
                         "1- for creating an account" + "\n" +
                         "2- for login to existing account" + "\n" +
                         "3- for ending the program");
-                firstMenuChoose = scanner.nextInt();
+                firstMenuChoose = FirstMenu.valueOf(scanner.nextInt());
 
                 switch (firstMenuChoose) {
                     case CREATE_USER:
@@ -36,6 +34,8 @@ public class Main {
                         } else if (foundUser != null) {
                             store.setCurrentUser(foundUser);
                             store.chooseProductAndBuy();
+                        } else {
+                            System.out.println("Cant login , try again please");
                         }
                         break;
                     case END_PROGRAM:

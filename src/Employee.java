@@ -5,9 +5,6 @@ public class Employee extends Customer {
     private int salary;
     private int workingHours;
     private int rank;
-    public static final int MANAGER = 2;
-    public static final int REGULAR_WORKER = 1;
-    public static final int BOARD_MEMBER = 3;
 
 
     public Employee(String userName, String password, String firstName, String lastName, int rank) {
@@ -47,18 +44,27 @@ public class Employee extends Customer {
         String boardMember = "board member";
         String printedText = "";
         String fullName = this.firstName + " " + this.lastName;
-
-        if (this.rank == REGULAR_WORKER) {
+        if (this.rank == KindOfWorker.REGULAR_WORKER.ordinal() + 1) {
             printedText = fullName + " (" + regular + ")" + "!\n";
-        } else if (this.rank == MANAGER) {
+        } else if (this.rank == KindOfWorker.MANAGER.ordinal() + 1) {
             printedText = fullName + " (" + manager + ")" + "!\n";
-        } else if (this.rank == BOARD_MEMBER) {
+        } else if (this.rank == KindOfWorker.BOARD_MEMBER.ordinal() + 1) {
             printedText = fullName + " (" + boardMember + ")" + "!\n";
         }
-        printedText += " " + "number of buys: " +
-                "" + super.getNumberOfBuys() + "\n total sum of all buys: " + super.getAllBuysSum()
-                + " \n lats purchase made at: " + super.getLastVisit() + "\n";
+        StringBuilder s = new StringBuilder(" ");
+        s.append("number of buys: ")
+                .append(super.getNumberOfBuys())
+                .append("\n total sum of all buys: ")
+                .append(super.getAllBuysSum())
+                .append(" \n lats purchase made at: ");
+        if (super.getLastVisit() == null) {
+            s.append("didn't visit the store yet");
+        } else {
+            s.append(super.getLastVisit());
+        }
+        s.append("\n");
 
+        printedText += s;
         return printedText;
     }
 }

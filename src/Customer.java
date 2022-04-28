@@ -8,7 +8,7 @@ public class Customer {
     private String password;
     private int numberOfBuys;
     private boolean isMember;
-    private Date lastVisit;
+    protected Date lastVisit;
     private double allBuysSum;
     private double currentSum;
 
@@ -71,7 +71,6 @@ public class Customer {
 
     }
 
-
     public void setAllBuysSum(double add) {
         this.allBuysSum += add;
     }
@@ -114,18 +113,27 @@ public class Customer {
     public String toString() {
         String printedText;
         String fullName = this.firstName + " " + this.lastName;
-
+        StringBuilder s = new StringBuilder();
         if (isMember) {
             printedText = fullName + " (VIP)!\n";
 
         } else {
             printedText = fullName + "!\n";
         }
-        printedText += " " + "number of buys: " +
-                "" + this.numberOfBuys + "\n total sum of all buys: " + this.allBuysSum
-                + " \n lats purchase made at: " + this.lastVisit + "\n";
+        s.append(" ")
+                .append("number of buys: ")
+                .append(this.numberOfBuys)
+                .append("\n total sum of all buys: ")
+                .append(this.allBuysSum)
+                .append(" \n lats purchase made at: ");
+        if (this.lastVisit == null) {
+            s.append("didn't buy yet");
+        } else {
+            s.append(" ").append(this.lastVisit);
+        }
+        printedText += s;
 
         return printedText;
-    }
 
+    }
 }

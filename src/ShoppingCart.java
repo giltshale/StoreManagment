@@ -1,13 +1,16 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class ShoppingCart {
-    private Products[] products;
+    private List<Products> products;
     private double totalToPay;
 
     public ShoppingCart() {
-        this.products = new Products[0];
+        this.products = new ArrayList<>();
         this.totalToPay = 0;
     }
 
-    public void setProducts(Products[] products) {
+    public void setProducts(List<Products> products) {
         this.products = products;
     }
 
@@ -15,7 +18,7 @@ public class ShoppingCart {
         this.totalToPay = totalToPay;
     }
 
-    public Products[] getProducts() {
+    public List<Products> getProducts() {
         return products;
     }
 
@@ -24,22 +27,24 @@ public class ShoppingCart {
     }
 
     public void add(Products product, int amount) {
-        incArrayOfProducts(amount);
         for (int i = 0; i < amount; i++) {
-            this.products[products.length - amount + i] = product;
+            this.products.add(product);
+            System.out.println(amount+ "pieces of "+product +" has been added succesufly !");
         }
 
     }
 
-    private void incArrayOfProducts(int amount) {
-
-        Products[] products1 = new Products[products.length + amount];
+   /*  private void incArrayOfProducts(int amount) {
+        List<Products> products1=new ArrayList<>();
+        for(Products p: products)
+            products1.add(p);
+       Products[] products1 = new Products[products.length + amount];
         for (int i = 0; i < products.length; i++) {
             products1[i] = products[i];
         }
         this.products = products1;
 
-    }
+    }*/
 }
 
 
